@@ -1,0 +1,37 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS Lambda function and API Gateway API'
+
+Resources:
+  SortJsonFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: sort_json
+      Runtime: nodejs12.x
+      Handler: index.handler
+      Role: !GetAtt LambdaRole.Arn
+      Code:
+        ZipFile: !Sub |
+          'use strict';
+          
+          exports.handler = async (event) => {
+            // Sort the JSON object alphabetically by key
+            const sorted = {};
+            Object.keys(event).sort().forEach((key) => {
+              sorted[key] = event[key];
+            });
+            
+            return {
+              statusCode: 200,
+              body: JSON.stringify(sorted),
+            };
+          };
+  SortJsonApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: sort_json_api
+  SortJsonResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref SortJsonApi
+      ParentId: !GetAtt SortJsonApi.RootResourceId
