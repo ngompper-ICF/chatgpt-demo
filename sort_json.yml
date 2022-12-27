@@ -16,6 +16,15 @@ Resources:
                 - lambda.amazonaws.com
             Action:
               - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: invoke_api_policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - apigateway:*
+                Resource: '*'
   SortJsonFunction:
     Type: AWS::Lambda::Function
     Properties:
@@ -71,3 +80,10 @@ Resources:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
         Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SortJsonFunction.Arn}/invocations'
+  SortJsonPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SortJsonFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SortJsonApi}/*/*'
