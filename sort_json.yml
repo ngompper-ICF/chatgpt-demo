@@ -59,3 +59,4 @@ Resources:
     Properties:
       RestApiId: !Ref SortJsonApi
       ParentId: !GetAtt SortJsonApi.RootResourceId
+      PathPart: sort
