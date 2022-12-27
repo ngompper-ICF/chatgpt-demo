@@ -37,21 +37,28 @@ Resources:
           'use strict';
           
           exports.handler = async (event) => {
+            // Parse the request body to extract the JSON payload
+            const requestBody = JSON.parse(event.body);
+  
+            // Read the request variables from the parsed request body
+            const sortBy = requestBody.sortBy;
+            const data = requestBody.data;
+
             let sorted;
             
             // Sort the input based on the specified parameter
-            if (event.sortBy === 'key') {
+            if (sortBy === 'key') {
               // Sort the JSON object alphabetically by key
               sorted = {};
-              Object.keys(event.data).sort().forEach((key) => {
-                sorted[key] = event.data[key];
+              Object.keys(data).sort().forEach((key) => {
+                sorted[key] = data[key];
               });
-            } else if (event.sortBy === 'alphabetical') {
+            } else if (sortBy === 'alphabetical') {
               // Sort the JSON array alphabetically by element value
-              sorted = event.data.sort((a, b) => a.localeCompare(b));
-            } else if (event.sortBy === 'numeric') {
+              sorted = data.sort((a, b) => a.localeCompare(b));
+            } else if (sortBy === 'numeric') {
               // Sort the JSON array numerically by element value
-              sorted = event.data.sort((a, b) => a - b);
+              sorted = data.sort((a, b) => a - b);
             }
             
             return {
