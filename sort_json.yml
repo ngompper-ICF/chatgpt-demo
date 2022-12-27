@@ -60,3 +60,14 @@ Resources:
       RestApiId: !Ref SortJsonApi
       ParentId: !GetAtt SortJsonApi.RootResourceId
       PathPart: sort
+  SortJsonMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: POST
+      ResourceId: !Ref SortJsonResource
+      RestApiId: !Ref SortJsonApi
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SortJsonFunction.Arn}/invocations'
