@@ -3,6 +3,19 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'AWS Lambda function and API Gateway API'
 
 Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: lambda_role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
   SortJsonFunction:
     Type: AWS::Lambda::Function
     Properties:
@@ -15,11 +28,22 @@ Resources:
           'use strict';
           
           exports.handler = async (event) => {
-            // Sort the JSON object alphabetically by key
-            const sorted = {};
-            Object.keys(event).sort().forEach((key) => {
-              sorted[key] = event[key];
-            });
+            let sorted;
+            
+            // Sort the input based on the specified parameter
+            if (event.sortBy === 'key') {
+              // Sort the JSON object alphabetically by key
+              sorted = {};
+              Object.keys(event.data).sort().forEach((key) => {
+                sorted[key] = event.data[key];
+              });
+            } else if (event.sortBy === 'alphabetical') {
+              // Sort the JSON array alphabetically by element value
+              sorted = event.data.sort((a, b) => a.localeCompare(b));
+            } else if (event.sortBy === 'numeric') {
+              // Sort the JSON array numerically by element value
+              sorted = event.data.sort((a, b) => a - b);
+            }
             
             return {
               statusCode: 200,
